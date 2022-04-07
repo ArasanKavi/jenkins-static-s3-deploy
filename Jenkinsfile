@@ -1,20 +1,26 @@
 pipeline {
     agent any
+    stages {
+      stage("Pushing build to s3 bucket") {
+            steps {
 
-    stages{
-        stage('deploy to S3'){
-            steps{
-                sh 'aws s3 cp public/index.html s3://bucketnewly'
-                sh 'aws s3api put-object-acl --bucket bucketnewly --key index.html --acl public-read'
-                sh 'aws s3 cp public/error.html s3://bucketnewly'
-                sh 'aws s3api put-object-acl --bucket bucketnewly --key error.html --acl public-read'
-            }
-        }
-    }
-    post{
-        always{
-            cleanWs disableDeferredWipeout: true, deleteDirs: true
-        }
-    }
+                 withCredentials([[
+                 $class: 'AmazonWebServicesCredentialsBinding',
+                 
+                 accessKeyVariable: 'AKIATSSXBUSZSIVDANE7',
+                 secretKeyVariable: '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'
+                ]]) {
+                // AWS Code
+                sh """   
+                  
+                    
+            aws s3 cp ./jenkins-static-s3-deploy s3://bucketnewly--recursive 
+            
+          aws cloudfront create-invalidation --distribution-id E3N569NDVQ6CD8 --paths "/*"
+                """
+                }
+            } 
+        } 
 
+    }
 }
