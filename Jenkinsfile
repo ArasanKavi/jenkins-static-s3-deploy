@@ -1,26 +1,15 @@
 pipeline {
     agent any
+pipeline {
+    agent any
     stages {
-      stage("Pushing build to s3 bucket") {
+        stage('deploy') {
             steps {
-
-                 withCredentials([[
-                 $class: 'AmazonWebServicesCredentialsBinding',
-                 
-                 accessKeyVariable: 'AKIATSSXBUSZSIVDANE7',
-                 secretKeyVariable: '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'
-                ]]) {
-                // AWS Code
-                sh """   
-                  
-                    
-            aws s3 cp ./jenkins-static-s3-deploy s3://bucketnewly--recursive 
-            
-          aws cloudfront create-invalidation --distribution-id E3N569NDVQ6CD8 --paths "/*"
-                """
-                }
-            } 
-        } 
-
+              sh "aws configure set region $AWS_DEFAULT_REGION"
+              sh "aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID"
+              sh "aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY"
+              sh "aws s3 cp Code/index.html s3://bucketnewly"
+            }
+        }
     }
 }
